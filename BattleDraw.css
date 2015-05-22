@@ -39,7 +39,7 @@ h2 {
 	font-size: 35px;
 }
 
-#joinSubmit {
+.button {
 	display: block;
 	margin: auto;
 	border: none;
