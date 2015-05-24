@@ -7,6 +7,13 @@
 		{{> loginButtons}}
 	</div>
 	<div id="main">
+		{{> form}}
+		{{> game}}
+	</div>
+</body>
+
+<template name="form">
+	{{#if display}}
 		<div class="form">
 			<h2>
 				Join Game
@@ -24,5 +31,11 @@
 				<input type="submit" id="createSubmit" value="Create!" class="button" />
 			</form>
 		</div>
-	</div>
-</body>
+	{{/if}}
+</template>
+
+<template name="game">
+	{{#if display}}
+		
+	{{/if}}
+</template>

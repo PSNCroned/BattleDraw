@@ -1,7 +1,6 @@
 Template.body.events({
 	"submit #joinGame": function (event, form) {
 		event.preventDefault();
-		console.log("test2");
 		var gameId = form.find("#gameId").value;
 		var username = Meteor.user().username;
 		var infoObj = {
@@ -25,8 +24,5 @@ Template.body.events({
 				"username": Meteor.user().username
 			});
 		});
-	},
-	"click h2": function () {
-		console.log("test");
 	}
 });

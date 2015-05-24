@@ -8,6 +8,17 @@ if (Meteor.isClient) {
 	Accounts.ui.config({
 		passwordSignupFields: "USERNAME_ONLY"
 	});
+
+	
+	setInterval(function () {
+		if (Meteor.user()) {
+			var userInfo = UserInfo.find().fetch();
+			if (!userInfo[0]) {
+				var userObj = { "username": Meteor.user().username, "inGame": false }
+				Meteor.call("addUser", userObj);
+			}
+		}
+		}, 100);
 }
 
 if (Meteor.isServer) {
@@ -20,6 +31,10 @@ if (Meteor.isServer) {
 	});
 
 	Meteor.publish("userinfo", function () {
-		return UserInfo.find();
+		var userId = this.userId;
+		if (userId) {
+			var username = Meteor.users.findOne(userId).username;
+			return UserInfo.find({ "username": username });
+		}
 	});
 }

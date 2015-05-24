@@ -19,9 +19,12 @@ Meteor.methods({
 		var gameId = infoObj.gameId;
 		var username = infoObj.username;
 		var Game = GameList.find({ _id: gameId }).fetch()[0];
-		console.log(Game);
+
+		UserInfo.update({"username": username}, {
+			"username": username,
+			"inGame": true
+		});
 		Game.pList.push(username);
-		console.log(Game.pList);
 		GameList.update(gameId, {
 			"host": Game.host,
 			"maxPlayers": Game.maxPlayers,
@@ -29,5 +32,12 @@ Meteor.methods({
 			"numPlayers": Game.numPlayers,
 			"hasStarted": Game.hasStarted
 		});
+	},
+	"addUser": function (userObj) {
+		UserInfo.insert(userObj);
+		console.log("Inserted " + userObj + " into UserInfo");
+	},
+	"removeUser": function (name) {
+		UserInfo.remove({ "username": { $eq: name } });
 	}
 });
