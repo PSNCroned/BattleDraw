@@ -22,7 +22,8 @@ Meteor.methods({
 
 		UserInfo.update({"username": username}, {
 			"username": username,
-			"inGame": true
+			"inGame": true,
+			"gameId": gameId
 		});
 		Game.pList.push(username);
 		GameList.update(gameId, {
@@ -34,8 +35,11 @@ Meteor.methods({
 		});
 	},
 	"addUser": function (userObj) {
-		UserInfo.insert(userObj);
-		console.log("Inserted " + userObj + " into UserInfo");
+		var exists = UserInfo.find({username: userObj.username}).fetch().length > 0;
+		if (!exists) {
+			UserInfo.insert(userObj);
+			console.log("Inserted " + userObj + " into UserInfo");
+		}
 	},
 	"removeUser": function (name) {
 		UserInfo.remove({ "username": { $eq: name } });
