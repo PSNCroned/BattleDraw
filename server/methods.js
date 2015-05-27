@@ -3,7 +3,7 @@ Meteor.methods({
 		var host = infoObj.host;
 		var maxPlayers = infoObj.maxPlayers;
 		var pList = [];
-		var numPlayers = 1;
+		var numPlayers = 0;
 		var hasStarted = false;
 		var gameId = GameList.insert({
 			"host": host,
@@ -26,6 +26,7 @@ Meteor.methods({
 			"gameId": gameId
 		});
 		Game.pList.push(username);
+		Game.numPlayers++;
 		GameList.update(gameId, {
 			"host": Game.host,
 			"maxPlayers": Game.maxPlayers,
@@ -40,8 +41,27 @@ Meteor.methods({
 			UserInfo.insert(userObj);
 			console.log("Inserted " + userObj + " into UserInfo");
 		}
+		else {
+			console.log("Stopped repeated insertion");
+		}
 	},
 	"removeUser": function (name) {
 		UserInfo.remove({ "username": { $eq: name } });
+	},
+	"startGame": function(gameId) {
+		var Game = GameList.find({"_id": gameId}).fetch()[0];
+		if (this.userId) {
+			var user = Meteor.users.findOne(this.userId);
+			if (user.username == Game.host) {
+				Game.hasStarted = true;
+				GameList.update(gameId, {
+					"host": Game.host,
+					"maxPlayers": Game.maxPlayers,
+					"pList": Game.pList,
+					"numPlayers": Game.numPlayers,
+					"hasStarted": Game.hasStarted
+				});
+			}
+		}
 	}
 });

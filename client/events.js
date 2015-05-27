@@ -12,7 +12,7 @@ Template.body.events({
 	"submit #createGame": function (event, form) {
 		event.preventDefault();
 		var host = Meteor.user().username;
-		var maxPlayers = 4;
+		var maxPlayers = 2;
 		var infoObj = {
 			"host": host,
 			"maxPlayers": maxPlayers

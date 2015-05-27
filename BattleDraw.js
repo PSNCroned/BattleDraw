@@ -1,3 +1,4 @@
+/* global Tracker */
 /* global UserInfo */
 /* global GameList */
 /* global Meteor */
@@ -16,7 +17,7 @@ if (Meteor.isClient) {
 		passwordSignupFields: "USERNAME_ONLY"
 	});
 
-	Meteor.autorun(function () {
+	setInterval(function () {
 		if (Meteor.user()) {
 			var userInfo = UserInfo.find().fetch();
 			if (!userInfo[0]) {
@@ -24,7 +25,18 @@ if (Meteor.isClient) {
 				Meteor.call("addUser", userObj);
 			}
 		}
-	});
+		
+		if (Meteor.user()) {
+			var userInfoFetch = UserInfo.find({"username": Meteor.user().username}).fetch()[0];
+			if (userInfoFetch.inGame) {
+				var game = GameList.find({"_id": userInfoFetch.gameId}).fetch()[0];
+				
+				if (game.numPlayers == game.maxPlayers && game.host == Meteor.user().username) {
+					Meteor.call("startGame", game._id);
+				}
+			}
+	}
+	}, 100);
 }
 
 if (Meteor.isServer) {
