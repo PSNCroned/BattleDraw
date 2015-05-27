@@ -4,7 +4,6 @@
 /* global Accounts */
 /* global Template */
 /* global Mongo */
-//test
 GameList = new Mongo.Collection("games");
 UserInfo = new Mongo.Collection("userInfo");
 
@@ -21,7 +20,7 @@ if (Meteor.isClient) {
 		if (Meteor.user()) {
 			var userInfo = UserInfo.find().fetch();
 			if (!userInfo[0]) {
-				var userObj = { "username": Meteor.user().username, "inGame": false }
+				var userObj = { "username": Meteor.user().username, "inGame": false };
 				Meteor.call("addUser", userObj);
 			}
 		}
