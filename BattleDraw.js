@@ -1,3 +1,8 @@
+/* global UserInfo */
+/* global GameList */
+/* global Meteor */
+/* global Accounts */
+/* global Template */
 GameList = new Mongo.Collection("games");
 UserInfo = new Mongo.Collection("userInfo");
 
