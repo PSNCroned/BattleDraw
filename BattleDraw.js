@@ -4,6 +4,7 @@
 /* global Accounts */
 /* global Template */
 /* global Mongo */
+//test
 GameList = new Mongo.Collection("games");
 UserInfo = new Mongo.Collection("userInfo");
 
