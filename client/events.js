@@ -24,5 +24,8 @@ Template.body.events({
 				"username": Meteor.user().username
 			});
 		});
+	},
+	"click #loginSpan": function() {
+		
 	}
 });

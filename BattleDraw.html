@@ -4,7 +4,7 @@
 
 <body>
 	<div id="header">
-		{{> loginButtons}}
+		<span id="loginSpan">{{> loginButtons}}</span>
 	</div>
 	<div id="main">
 		{{> form}}
@@ -36,6 +36,8 @@
 
 <template name="game">
 	{{#if display}}
-		
+		<div id="gameWindow">
+			
+		</div>
 	{{/if}}
 </template>

@@ -1,10 +1,11 @@
 Template.form.helpers({
 	"display": function () {
+		var inGame;
 		if (Meteor.user()) {
-			var inGame = UserInfo.find({ "username": Meteor.user().username }).fetch()[0].inGame;
+			inGame = UserInfo.find({ "username": Meteor.user().username }).fetch()[0].inGame;
 		}
 		else {
-			var inGame = true;
+			inGame = true;
 		}
 		if (inGame) {
 			return false;
@@ -17,6 +18,18 @@ Template.form.helpers({
 
 Template.game.helpers({
 	"display": function () {
-
+		var inGame;
+		if (Meteor.user()) {
+			inGame = UserInfo.find({ "username": Meteor.user().username }).fetch()[0].inGame;
+		}
+		else {
+			inGame = false;
+		}
+		if (inGame) {
+			return true;
+		}
+		else {
+			return false;
+		}
 	}
 });

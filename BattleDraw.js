@@ -4,6 +4,7 @@
 /* global Accounts */
 /* global Template */
 /* global Mongo */
+
 GameList = new Mongo.Collection("games");
 UserInfo = new Mongo.Collection("userInfo");
 
@@ -15,8 +16,7 @@ if (Meteor.isClient) {
 		passwordSignupFields: "USERNAME_ONLY"
 	});
 
-	
-	setInterval(function () {
+	Meteor.autorun(function () {
 		if (Meteor.user()) {
 			var userInfo = UserInfo.find().fetch();
 			if (!userInfo[0]) {
@@ -24,7 +24,7 @@ if (Meteor.isClient) {
 				Meteor.call("addUser", userObj);
 			}
 		}
-		}, 100);
+	});
 }
 
 if (Meteor.isServer) {
