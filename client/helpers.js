@@ -7,6 +7,7 @@ Template.form.helpers({
 		else {
 			inGame = true;
 		}
+		
 		if (inGame) {
 			return false;
 		}
@@ -33,9 +34,18 @@ Template.game.helpers({
 		}
 	},
 	"hostName": function() {
-		return GameList.find({_id: UserInfo.find().fetch()[0].gameId}).fetch()[0].host;
+		return GameList.find(UserInfo.find().fetch()[0].gameId).fetch()[0].host;
 	},
 	"countDown": function() {
-		return GameList.find({_id: UserInfo.find().fetch()[0].gameId}).fetch()[0].countDown;
+		return GameList.find(UserInfo.find().fetch()[0].gameId).fetch()[0].countDown;
+	},
+	"showCountDown": function() {
+		var Game = GameList.find(UserInfo.find().fetch()[0].gameId).fetch()[0];
+		if (Game.hasStarted == true && Game.countDown > 0) {
+			return true;
+		}
+		else {
+			return false;
+		}
 	}
 });

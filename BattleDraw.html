@@ -40,10 +40,12 @@
 			<div id="gameTitle">
 				{{hostName}}'s Game
 			</div>
-			<div id="countDown">
-				Time Until Game Starts: {{countDown}}
-			</div>
-			<button id="leaveGame">Leave Game</button>
+			{{#if showCountDown}}
+				<div id="countDown">
+					Time Until Game Starts: {{countDown}}
+				</div>
+			{{/if}}
+			<button id="leaveGame" class="button">Leave Game</button>
 		</div>
 	{{/if}}
 </template>

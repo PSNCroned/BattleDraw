@@ -97,9 +97,14 @@ Meteor.methods({
 		console.log(user.username + " is leaving game " + gameId);
 		var Game = GameList.find({"_id": gameId}).fetch()[0];
 		var pList = Game.pList;
-		var index = pList.indexOf(user.username);
-		pList.splice(index, 1);
-		GameList.update(user.gameId, {
+		for (var i = 0; i < pList.length; i++) {
+			console.log("Comparing " + user.username + " to " + pList[i]);
+			if (pList[i] == user.username) {
+				console.log("Spliced " + pList.splice(i, 1));
+			}
+		}
+		console.log("gameId: " + gameId);
+		GameList.update(gameId, {
 			$set: {
 				"pList": pList
 			},

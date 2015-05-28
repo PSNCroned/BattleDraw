@@ -1,4 +1,8 @@
 Template.body.events({
+	
+});
+
+Template.form.events({
 	"submit #joinGame": function (event, form) {
 		event.preventDefault();
 		var gameId = form.find("#gameId").value;
@@ -11,7 +15,10 @@ Template.body.events({
 			console.log("Created game: " + result);
 			Meteor.call("joinGame", result);
 		});
-	},
+	}
+});
+
+Template.game.events({
 	"click #leaveGame": function () {
 		Meteor.call("leaveGame");
 	}
