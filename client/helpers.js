@@ -34,5 +34,8 @@ Template.game.helpers({
 	},
 	"hostName": function() {
 		return GameList.find({_id: UserInfo.find().fetch()[0].gameId}).fetch()[0].host;
+	},
+	"countDown": function() {
+		return GameList.find({_id: UserInfo.find().fetch()[0].gameId}).fetch()[0].countDown;
 	}
 });

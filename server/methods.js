@@ -5,12 +5,14 @@ Meteor.methods({
 		var pList = [];
 		var numPlayers = 0;
 		var hasStarted = false;
+		var countDown = 10;
 		var gameId = GameList.insert({
 			"host": host,
 			"maxPlayers": maxPlayers,
 			"pList": pList,
 			"numPlayers": numPlayers,
-			"hasStarted": hasStarted
+			"hasStarted": hasStarted,
+			"countDown": countDown
 		});
 		console.log(gameId);
 		return gameId;
@@ -32,7 +34,8 @@ Meteor.methods({
 			"maxPlayers": Game.maxPlayers,
 			"pList": Game.pList,
 			"numPlayers": Game.numPlayers,
-			"hasStarted": Game.hasStarted
+			"hasStarted": Game.hasStarted,
+			"countDown": Game.countDown
 		});
 	},
 	"addUser": function (userObj) {
@@ -50,6 +53,7 @@ Meteor.methods({
 	},
 	"startGame": function(gameId) {
 		var Game = GameList.find({"_id": gameId}).fetch()[0];
+		var startedAt = new Date();
 		if (this.userId) {
 			var user = Meteor.users.findOne(this.userId);
 			if (user.username == Game.host) {
@@ -59,7 +63,27 @@ Meteor.methods({
 					"maxPlayers": Game.maxPlayers,
 					"pList": Game.pList,
 					"numPlayers": Game.numPlayers,
-					"hasStarted": Game.hasStarted
+					"hasStarted": Game.hasStarted,
+					"countDown": Game.countDown,
+					"startedAt": startedAt
+				});
+			}
+		}
+	},
+	"updateCountDown": function(gameId) {
+		var Game = GameList.find({"_id": gameId}).fetch()[0];
+		if (Game.hasStarted) {
+			var currentTime = new Date();
+			var diff = currentTime.getSeconds() - Game.startedAt.getSeconds();
+			if (Game.countDown > 0 && diff < 11) {
+				var newCount = 10 - diff;
+				if (newCount >= 60) {
+					newCount -= 60;
+				}
+				GameList.update(gameId, {
+					$set: {
+						"countDown": newCount
+					}
 				});
 			}
 		}
