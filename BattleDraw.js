@@ -21,8 +21,7 @@ if (Meteor.isClient) {
 		if (Meteor.user()) {
 			var userInfo = UserInfo.find().fetch();
 			if (!userInfo[0]) {
-				var userObj = { "username": Meteor.user().username, "inGame": false };
-				Meteor.call("addUser", userObj);
+				Meteor.call("addUser");
 			}
 			
 			var userInfoFetch = UserInfo.find({"username": Meteor.user().username}).fetch()[0];

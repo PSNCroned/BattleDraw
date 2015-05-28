@@ -1,7 +1,6 @@
 Meteor.methods({
-	"createGame": function (infoObj) {
-		var host = infoObj.host;
-		var maxPlayers = infoObj.maxPlayers;
+	"createGame": function (maxPlayers) {
+		var host = Meteor.users.findOne(this.userId).username;
 		var pList = [];
 		var numPlayers = 0;
 		var hasStarted = false;
@@ -17,32 +16,35 @@ Meteor.methods({
 		console.log(gameId);
 		return gameId;
 	},
-	"joinGame": function (infoObj) {
-		var gameId = infoObj.gameId;
-		var username = infoObj.username;
+	"joinGame": function (gameId) {
+		var user = Meteor.users.findOne(this.userId);
+		var username = user.username;
 		var Game = GameList.find({ _id: gameId }).fetch()[0];
-
-		UserInfo.update({"username": username}, {
-			"username": username,
-			"inGame": true,
-			"gameId": gameId
-		});
-		Game.pList.push(username);
-		Game.numPlayers++;
-		GameList.update(gameId, {
-			"host": Game.host,
-			"maxPlayers": Game.maxPlayers,
-			"pList": Game.pList,
-			"numPlayers": Game.numPlayers,
-			"hasStarted": Game.hasStarted,
-			"countDown": Game.countDown
-		});
+		
+		if (Game.numPlayers != Game.maxPlayers) {
+			Game.pList.push(username);
+			Game.numPlayers++;
+			
+			GameList.update(gameId, {
+				$set: {
+					"pList": Game.pList,
+					"numPlayers": Game.numPlayers
+				}
+			});
+			UserInfo.update({"username": username}, {
+				$set: {
+					"inGame": true,
+					"gameId": gameId
+				}
+			});
+		}
 	},
 	"addUser": function (userObj) {
-		var exists = UserInfo.find({username: userObj.username}).fetch().length > 0;
+		var user = Meteor.users.findOne(this.userId);
+		var exists = UserInfo.find({username: user.username}).fetch().length > 0;
 		if (!exists) {
-			UserInfo.insert(userObj);
-			console.log("Inserted " + userObj + " into UserInfo");
+			UserInfo.insert({"username": user.username, "inGame": false});
+			console.log("Inserted " + user.username + " into UserInfo");
 		}
 		else {
 			console.log("Stopped repeated insertion");
@@ -53,19 +55,16 @@ Meteor.methods({
 	},
 	"startGame": function(gameId) {
 		var Game = GameList.find({"_id": gameId}).fetch()[0];
-		var startedAt = new Date();
 		if (this.userId) {
 			var user = Meteor.users.findOne(this.userId);
 			if (user.username == Game.host) {
 				Game.hasStarted = true;
+				var startedAt = new Date();
 				GameList.update(gameId, {
-					"host": Game.host,
-					"maxPlayers": Game.maxPlayers,
-					"pList": Game.pList,
-					"numPlayers": Game.numPlayers,
-					"hasStarted": Game.hasStarted,
-					"countDown": Game.countDown,
-					"startedAt": startedAt
+					$set: {
+						"hasStarted": Game.hasStarted,
+						"startedAt": startedAt
+					}
 				});
 			}
 		}
