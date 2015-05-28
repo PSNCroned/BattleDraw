@@ -43,7 +43,11 @@ Meteor.methods({
 		var user = Meteor.users.findOne(this.userId);
 		var exists = UserInfo.find({username: user.username}).fetch().length > 0;
 		if (!exists) {
-			UserInfo.insert({"username": user.username, "inGame": false});
+			UserInfo.insert({
+				"username": user.username,
+				"inGame": false
+			});
+			
 			console.log("Inserted " + user.username + " into UserInfo");
 		}
 		else {
@@ -86,5 +90,31 @@ Meteor.methods({
 				});
 			}
 		}
+	},
+	"leaveGame": function () {
+		var user = Meteor.users.findOne(this.userId);
+		var gameId = UserInfo.find({"username": user.username}).fetch()[0].gameId;
+		console.log(user.username + " is leaving game " + gameId);
+		var Game = GameList.find({"_id": gameId}).fetch()[0];
+		var pList = Game.pList;
+		var index = pList.indexOf(user.username);
+		pList.splice(index, 1);
+		GameList.update(user.gameId, {
+			$set: {
+				"pList": pList
+			},
+			$inc: {
+				"numPlayers": -1
+			}
+		});
+		
+		UserInfo.update({"username": user.username}, {
+			$set: {
+				"inGame": false
+			},
+			$unset: {
+				"gameId": ""
+			}
+		});
 	}
 });
