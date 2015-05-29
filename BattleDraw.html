@@ -5,6 +5,9 @@
 <body>
 	<div id="header">
 		<span id="loginSpan">{{> loginButtons}}</span>
+		{{#if showLeave}}
+			<button id="leaveGame">Leave Game</button>
+		{{/if}}
 	</div>
 	<div id="main">
 		{{> form}}
@@ -45,7 +48,6 @@
 					Time Until Game Starts: {{countDown}}
 				</div>
 			{{/if}}
-			<button id="leaveGame" class="button">Leave Game</button>
 		</div>
 	{{/if}}
 </template>

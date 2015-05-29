@@ -1,5 +1,7 @@
 Template.body.events({
-	
+	"click #leaveGame": function () {
+		Meteor.call("leaveGame");
+	}
 });
 
 Template.form.events({
@@ -19,7 +21,5 @@ Template.form.events({
 });
 
 Template.game.events({
-	"click #leaveGame": function () {
-		Meteor.call("leaveGame");
-	}
+	
 });

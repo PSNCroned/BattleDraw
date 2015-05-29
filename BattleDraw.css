@@ -60,4 +60,21 @@ h2 {
 	font-family: Arial;
 	font-size: 50px;
 	text-align: center;
+	padding-top: 10px;
+}
+
+#countDown {
+	text-align: center;
+}
+
+#leaveGame {
+	border: none;
+	background: none;
+	cursor: pointer;
+	font-family: sans-serif;
+	font-size: 17px;
+	color: white;
+	position: relative;
+	float: right;
+	text-decoration: underline;
 }

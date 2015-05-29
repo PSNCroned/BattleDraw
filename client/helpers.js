@@ -1,3 +1,22 @@
+Template.body.helpers({
+	"showLeave": function() {
+		var inGame;
+		if (Meteor.user()) {
+			inGame = UserInfo.find({ "username": Meteor.user().username }).fetch()[0].inGame;
+		}
+		else {
+			inGame = false;
+		}
+		
+		if (inGame) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+});
+
 Template.form.helpers({
 	"display": function () {
 		var inGame;
