@@ -1,25 +1,30 @@
 Meteor.methods({
 	"createGame": function (maxPlayers) {
-		var host = Meteor.users.findOne(this.userId).username;
-		var pList = [];
-		var numPlayers = 0;
-		var hasStarted = false;
-		var countDown = 10;
-		var gameId = GameList.insert({
-			"host": host,
-			"maxPlayers": maxPlayers,
-			"pList": pList,
-			"numPlayers": numPlayers,
-			"hasStarted": hasStarted,
-			"countDown": countDown
-		});
-		console.log(gameId);
-		return gameId;
+		maxPlayers = Math.round(maxPlayers);
+		if (maxPlayers > 0 && maxPlayers <= 2) {
+			var host = Meteor.users.findOne(this.userId).username;
+			var pList = [];
+			var numPlayers = 0;
+			var hasStarted = false;
+			var countDown = 10;
+			var gameId = GameList.insert({
+				"host": host,
+				"maxPlayers": maxPlayers,
+				"pList": pList,
+				"numPlayers": numPlayers,
+				"hasStarted": hasStarted,
+				"countDown": countDown,
+				"round": 0,
+				"turn": 0
+			});
+			console.log("Created game: " + gameId);
+			return gameId;
+		}
 	},
 	"joinGame": function (gameId) {
 		var user = Meteor.users.findOne(this.userId);
 		var username = user.username;
-		var Game = GameList.find({ _id: gameId }).fetch()[0];
+		var Game = GameList.find(gameId).fetch()[0];
 		
 		if (Game.numPlayers != Game.maxPlayers) {
 			Game.pList.push(username);
@@ -50,15 +55,12 @@ Meteor.methods({
 			
 			console.log("Inserted " + user.username + " into UserInfo");
 		}
-		else {
-			console.log("Stopped repeated insertion");
-		}
 	},
 	"removeUser": function (name) {
 		UserInfo.remove({ "username": { $eq: name } });
 	},
-	"startGame": function(gameId) {
-		var Game = GameList.find({"_id": gameId}).fetch()[0];
+	"beginCount": function(gameId) {
+		var Game = GameList.find(gameId).fetch()[0];
 		if (this.userId) {
 			var user = Meteor.users.findOne(this.userId);
 			if (user.username == Game.host) {
@@ -74,7 +76,7 @@ Meteor.methods({
 		}
 	},
 	"updateCountDown": function(gameId) {
-		var Game = GameList.find({"_id": gameId}).fetch()[0];
+		var Game = GameList.find(gameId).fetch()[0];
 		if (Game.hasStarted) {
 			var currentTime = new Date();
 			var diff = currentTime.getSeconds() - Game.startedAt.getSeconds();
@@ -91,11 +93,14 @@ Meteor.methods({
 			}
 		}
 	},
+	"startGame": function () {
+		
+	},
 	"leaveGame": function () {
 		var user = Meteor.users.findOne(this.userId);
 		var gameId = UserInfo.find({"username": user.username}).fetch()[0].gameId;
 		console.log(user.username + " is leaving game " + gameId);
-		var Game = GameList.find({"_id": gameId}).fetch()[0];
+		var Game = GameList.find(gameId).fetch()[0];
 		var pList = Game.pList;
 		for (var i = 0; i < pList.length; i++) {
 			console.log("Comparing " + user.username + " to " + pList[i]);
@@ -103,7 +108,7 @@ Meteor.methods({
 				console.log("Spliced " + pList.splice(i, 1));
 			}
 		}
-		console.log("gameId: " + gameId);
+		console.log(user.username + " left game " + gameId);
 		GameList.update(gameId, {
 			$set: {
 				"pList": pList

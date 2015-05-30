@@ -26,10 +26,10 @@ if (Meteor.isClient) {
 			
 			var userInfoFetch = UserInfo.find({"username": Meteor.user().username}).fetch()[0];
 			if (userInfoFetch.inGame) {
-				var game = GameList.find({"_id": userInfoFetch.gameId}).fetch()[0];
+				var game = GameList.find(userInfoFetch.gameId).fetch()[0];
 				
 				if (game.numPlayers == game.maxPlayers && game.host == Meteor.user().username && !game.hasStarted) {
-					Meteor.call("startGame", game._id);
+					Meteor.call("beginCount", game._id);
 				}
 				Meteor.call("updateCountDown", game._id);
 			}
@@ -40,7 +40,7 @@ if (Meteor.isClient) {
 		if (Meteor.user()) {
 			var userInfoFetch = UserInfo.find({"username": Meteor.user().username}).fetch()[0];
 			if (userInfoFetch.inGame) {
-				var game = GameList.find({"_id": userInfoFetch.gameId}).fetch()[0];
+				var game = GameList.find(userInfoFetch.gameId).fetch()[0];
 				if (game.countDown > 0) {
 					Meteor.call("updateCountDown", game._id);
 				}

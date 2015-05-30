@@ -58,13 +58,17 @@ Template.game.helpers({
 	"countDown": function() {
 		return GameList.find(UserInfo.find().fetch()[0].gameId).fetch()[0].countDown;
 	},
-	"showCountDown": function() {
+	"subHeader": function() {
 		var Game = GameList.find(UserInfo.find().fetch()[0].gameId).fetch()[0];
 		if (Game.hasStarted == true && Game.countDown > 0) {
-			return true;
+			return "Time Until Game Starts: " + Game.countDown;
+		}
+		else if (Game.hasStarted == false) {
+			return "Join Game Code: " + Game._id;
 		}
 		else {
-			return false;
+			var turn = Game.turn;
+			return Game.pList[turn] + "'s Turn";
 		}
 	}
 });

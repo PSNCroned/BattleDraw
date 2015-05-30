@@ -14,7 +14,7 @@ body {
 #main {
 	margin: auto;
 	width: 1000px;
-	height: 600px;
+	height: 700px;
 	background-color: #555;
 	border-radius: 3px;
 }
@@ -63,8 +63,9 @@ h2 {
 	padding-top: 10px;
 }
 
-#countDown {
+#subHeader {
 	text-align: center;
+	height: 15px;
 }
 
 #leaveGame {
@@ -77,4 +78,34 @@ h2 {
 	position: relative;
 	float: right;
 	text-decoration: underline;
+}
+
+.windowSection {
+	width: 100%;
+	border: 1px solid black;
+	margin-top: 10px;
+}
+
+#theirCards {
+	width: 800px;
+	height: 150px;
+	margin: auto;
+	overflow-x: scroll;
+}
+
+#centerWindow {
+	height: 200px;
+}
+
+#yourCards {
+	width: 800px;
+	height: 150px;
+	margin: auto;
+	overflow-x: scroll;
+}
+
+.stats {
+	width: 800px;
+	height: 25px;
+	margin: 10px auto 10px auto;
 }
