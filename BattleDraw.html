@@ -55,7 +55,17 @@
 				{{/if}}
 			</div>
 			<div id="theirCards" class="windowSection">
-				
+				<table class="cardTable">
+					<tr>
+						{{#each theirCards}}
+							<td>
+								<div class="card">
+									<span class="cardTitle">Card Back Image Here</span>
+								</div>
+							</td>
+						{{/each}}
+					</tr>
+				</table>
 			</div>
 			<div id="centerWindow" class="windowSection">
 				
@@ -69,7 +79,17 @@
 				{{/if}}
 			</div>
 			<div id="yourCards" class="windowSection">
-				
+				<table class="cardTable" id="yourCardTable">
+					<tr>
+						{{#each yourCards}}
+							<td>
+								<div class="card">
+									<span class="cardTitle">{{name}}</span>
+								</div>
+							</td>
+						{{/each}}
+					</tr>
+				</table>
 			</div>
 		</div>
 	{{/if}}

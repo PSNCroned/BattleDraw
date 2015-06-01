@@ -5,6 +5,8 @@
 /* global Accounts */
 /* global Template */
 /* global Mongo */
+/* global $ */
+
 
 GameList = new Mongo.Collection("games");
 UserInfo = new Mongo.Collection("userInfo");
@@ -35,6 +37,12 @@ if (Meteor.isClient) {
 				}
 				Meteor.call("updateCountDown", game._id);
 			}
+		}
+		if ($("#yourCardTable").width() > 800) {
+			$("#yourCards").css("overflow-x", "scroll");
+		}
+		else {
+			$("#yourCards").css("overflow-x", "hidden");
 		}
 	}, 100);
 	

@@ -93,9 +93,11 @@ h2 {
 
 #theirCards {
 	width: 800px;
-	height: 150px;
+	height: 180px;
 	margin: auto;
-	overflow-x: scroll;
+	overflow-x: hidden;
+	border: none;
+	text-align: center;
 }
 
 #centerWindow {
@@ -109,9 +111,11 @@ h2 {
 
 #yourCards {
 	width: 800px;
-	height: 150px;
+	height: 180px;
 	margin: auto;
 	overflow-x: scroll;
+	text-align: center;
+	border: none;
 }
 
 .stats {
@@ -123,4 +127,23 @@ h2 {
 .stat {
 	display: inline;
 	margin-left: 90px;
+}
+
+.cardTable {
+	margin: auto;
+}
+
+.card {
+	padding: 5px;
+	height: 145px;
+	width: 125px;
+	border: 1px solid black;
+	margin-right: 5px;
+	background-color: burlywood;
+	text-align: center;
+	display: inline-block;
+}
+
+.cardTitle {
+	font-weight: bold;
 }

@@ -89,5 +89,33 @@ Template.game.helpers({
 			var stats = UserInfo.find({"username": Meteor.user().username}).fetch()[0].stats;
 			return stats;
 		}
+	},
+	"theirCards": function () {
+		var Game = GameList.find(UserInfo.find({ "username": Meteor.user().username }).fetch()[0].gameId).fetch()[0];
+		if (Game.hasStarted == true) {
+			 var players = Game.pList;		 
+			 for (var i = 0; i < players.length; i++) {
+				 if (players[i] == Meteor.user().username) {
+					 players.splice(i, 1);
+				 }
+			 }
+			 var cardsInHand = UserInfo.find({"username": players[0]}).fetch()[0].stats.cards;
+			 var cardList = [];
+			 for (var i = 0; i < cardsInHand.length; i++) {
+				 cardList.push(CardList.find(cardsInHand[i]).fetch()[0]);
+			 }
+			 return cardList;
+		}
+	},
+	"yourCards": function () {
+		var Game = GameList.find(UserInfo.find({ "username": Meteor.user().username }).fetch()[0].gameId).fetch()[0];
+		if (Game.hasStarted == true) {
+			var cardsInHand = UserInfo.find({"username": Meteor.user().username}).fetch()[0].stats.cards;
+			var cardList = [];
+			for (var i = 0; i < cardsInHand.length; i++) {
+				cardList.push(CardList.find(cardsInHand[i]).fetch()[0]);
+			}
+			return cardList;
+		}
 	}
 });
