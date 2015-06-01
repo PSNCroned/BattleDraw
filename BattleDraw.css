@@ -14,7 +14,7 @@ body {
 #main {
 	margin: auto;
 	width: 1000px;
-	height: 700px;
+	height: 750px;
 	background-color: #555;
 	border-radius: 3px;
 }
@@ -86,6 +86,11 @@ h2 {
 	margin-top: 10px;
 }
 
+#theirStats {
+	border: none;
+	padding-top: 10px;
+}
+
 #theirCards {
 	width: 800px;
 	height: 150px;
@@ -95,6 +100,11 @@ h2 {
 
 #centerWindow {
 	height: 200px;
+}
+
+#yourStats {
+	border: none;
+	padding-top: 10px;
 }
 
 #yourCards {
@@ -108,4 +118,9 @@ h2 {
 	width: 800px;
 	height: 25px;
 	margin: 10px auto 10px auto;
+}
+
+.stat {
+	display: inline;
+	margin-left: 90px;
 }

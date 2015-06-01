@@ -75,9 +75,12 @@ Meteor.methods({
 			}
 		}
 	},
-	"updateCountDown": function(gameId) {
+	"updateCountDown": function() {
+		var user = Meteor.users.findOne(this.userId);
+		var userInfo = UserInfo.find({"username": user.username}).fetch()[0];
+		var gameId = userInfo.gameId;
 		var Game = GameList.find(gameId).fetch()[0];
-		if (Game.hasStarted) {
+		if (Game.hasStarted && user.username == Game.host) {
 			var currentTime = new Date();
 			var diff = currentTime.getSeconds() - Game.startedAt.getSeconds();
 			if (Game.countDown > 0 && diff < 11) {
@@ -94,7 +97,22 @@ Meteor.methods({
 		}
 	},
 	"startGame": function () {
-		
+		var user = Meteor.users.findOne(this.userId);
+		var userInfo = UserInfo.find({"username": user.username}).fetch()[0];
+		var gameId = userInfo.gameId;
+		var Game = GameList.find(gameId).fetch()[0];
+		if (Game.hasStarted && user.username == Game.host) {
+			var stats = {};
+			for (var i = 0; i < Game.maxPlayers; i++) {
+				//sets default stats below
+				stats[Game.pList[i]] = {"units": 100, "money": 1500, "territory": 50, "supplies": 40};
+			}
+			GameList.update(gameId, {
+				$set: {
+					"stats": stats
+				}
+			});
+		}
 	},
 	"leaveGame": function () {
 		var user = Meteor.users.findOne(this.userId);

@@ -70,5 +70,23 @@ Template.game.helpers({
 			var turn = Game.turn;
 			return Game.pList[turn] + "'s Turn";
 		}
+	},
+	"theirStats": function() {
+		var Game = GameList.find(UserInfo.find().fetch()[0].gameId).fetch()[0];
+		if (Game.hasStarted == true) {
+			 var players = Game.pList;
+			 for (var i = 0; i < players.length; i++) {
+				 if (players[i] = Meteor.user().username) {
+					 players.splice(i, 1);
+				 }
+			 }
+			 var stats = Game.stats[players[0]];
+			 return stats;
+		}
+	},
+	"yourStats": function() {
+		 var Game = GameList.find(UserInfo.find().fetch()[0].gameId).fetch()[0];
+		 var stats = Game.stats[Meteor.user().username];
+		 return stats;
 	}
 });

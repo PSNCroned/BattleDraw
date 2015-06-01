@@ -47,7 +47,12 @@
 				{{subHeader}}
 			</div>
 			<div id="theirStats" class="stats windowSection">
-				
+				{{#if theirStats}}
+					<div class="stat">Units: {{theirStats.units}}</div>
+					<div class="stat">Money: ${{theirStats.money}}</div>
+					<div class="stat">Territory: {{theirStats.territory}}</div>
+					<div class="stat">Supplies: {{theirStats.supplies}}</div>
+				{{/if}}
 			</div>
 			<div id="theirCards" class="windowSection">
 				
@@ -56,7 +61,12 @@
 				
 			</div>
 			<div id="yourStats" class="stats windowSection">
-				
+				{{#if yourStats}}
+					<div class="stat">Units: {{yourStats.units}}</div>
+					<div class="stat">Money: {{yourStats.money}}</div>
+					<div class="stat">Territory: {{yourStats.territory}}</div>
+					<div class="stat">Supplies: {{yourStats.supplies}}</div>
+				{{/if}}
 			</div>
 			<div id="yourCards" class="windowSection">
 				
