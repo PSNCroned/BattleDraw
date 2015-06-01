@@ -53,13 +53,13 @@ Template.game.helpers({
 		}
 	},
 	"hostName": function() {
-		return GameList.find(UserInfo.find().fetch()[0].gameId).fetch()[0].host;
+		return GameList.find(UserInfo.find({ "username": Meteor.user().username }).fetch()[0].gameId).fetch()[0].host;
 	},
 	"countDown": function() {
-		return GameList.find(UserInfo.find().fetch()[0].gameId).fetch()[0].countDown;
+		return GameList.find(UserInfo.find({ "username": Meteor.user().username }).fetch()[0].gameId).fetch()[0].countDown;
 	},
 	"subHeader": function() {
-		var Game = GameList.find(UserInfo.find().fetch()[0].gameId).fetch()[0];
+		var Game = GameList.find(UserInfo.find({ "username": Meteor.user().username }).fetch()[0].gameId).fetch()[0];
 		if (Game.hasStarted == true && Game.countDown > 0) {
 			return "Time Until Game Starts: " + Game.countDown;
 		}
@@ -72,21 +72,22 @@ Template.game.helpers({
 		}
 	},
 	"theirStats": function() {
-		var Game = GameList.find(UserInfo.find().fetch()[0].gameId).fetch()[0];
+		var Game = GameList.find(UserInfo.find({ "username": Meteor.user().username }).fetch()[0].gameId).fetch()[0];
 		if (Game.hasStarted == true) {
-			 var players = Game.pList;
+			 var players = Game.pList;		 
 			 for (var i = 0; i < players.length; i++) {
-				 if (players[i] = Meteor.user().username) {
+				 if (players[i] == Meteor.user().username) {
 					 players.splice(i, 1);
 				 }
 			 }
-			 var stats = Game.stats[players[0]];
-			 return stats;
+			 return UserInfo.find({"username": players[0]}).fetch()[0].stats;
 		}
 	},
 	"yourStats": function() {
-		 var Game = GameList.find(UserInfo.find().fetch()[0].gameId).fetch()[0];
-		 var stats = Game.stats[Meteor.user().username];
-		 return stats;
+		var Game = GameList.find(UserInfo.find({ "username": Meteor.user().username }).fetch()[0].gameId).fetch()[0];
+		if (Game.hasStarted) {
+			var stats = UserInfo.find({"username": Meteor.user().username}).fetch()[0].stats;
+			return stats;
+		}
 	}
 });

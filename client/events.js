@@ -21,5 +21,8 @@ Template.form.events({
 });
 
 Template.game.events({
-	
+	"click #gameTitle": function () {
+		console.log("calling draw");
+		Meteor.call("draw", 5, false, true);
+	}
 });

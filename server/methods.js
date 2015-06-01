@@ -102,14 +102,18 @@ Meteor.methods({
 		var gameId = userInfo.gameId;
 		var Game = GameList.find(gameId).fetch()[0];
 		if (Game.hasStarted && user.username == Game.host) {
-			var stats = {};
-			for (var i = 0; i < Game.maxPlayers; i++) {
-				//sets default stats below
-				stats[Game.pList[i]] = {"units": 100, "money": 1500, "territory": 50, "supplies": 40};
+			var stats = {"units": 100, "money": 1500, "territory": 50, "supplies": 40, "actionsLeft": 3, "cards": []};
+				
+			for (var i = 0; i < Game.pList.length; i++) {
+				UserInfo.update(UserInfo.find({"username": Game.pList[i]}).fetch()[0]._id, {
+					$set: {
+						"stats": stats
+					}
+				});
 			}
 			GameList.update(gameId, {
-				$set: {
-					"stats": stats
+				$inc: {
+					"round": 1
 				}
 			});
 		}
@@ -144,5 +148,93 @@ Meteor.methods({
 				"gameId": ""
 			}
 		});
+	},
+	"draw": function(amt, action, admin) {
+		var user = Meteor.users.findOne(this.userId);
+		var userInfo = UserInfo.find({"username": user.username}).fetch()[0];
+		var gameId = UserInfo.find({"username": user.username}).fetch()[0].gameId;
+		var Game = GameList.find(gameId).fetch()[0];
+		var draw = function(amt, action) {
+			console.log("Draw function called");
+			var cardsDrawn = [];
+			for (var i = 0; i < amt; i++) {
+				var rand = Math.floor((Math.random() * 1000) + 1);
+				console.log("Rand: " + rand);
+				var cardList, randIndex;
+				if (rand <= 500) {
+					cardList = CardList.find({"rarity": 1}).fetch();
+					randIndex = Math.floor(Math.random() * (cardList.length));
+					cardsDrawn.push(cardList[randIndex]._id);
+				}
+				else if (rand <= 700) {
+					cardList = CardList.find({"rarity": 2}).fetch();
+					randIndex = Math.floor(Math.random() * (cardList.length));
+					cardsDrawn.push(cardList[randIndex]._id);
+				}
+				else if (rand <= 850) {
+					cardList = CardList.find({"rarity": 3}).fetch();
+					randIndex = Math.floor(Math.random() * (cardList.length));
+					cardsDrawn.push(cardList[randIndex]._id);
+				}
+				else if (rand <= 955) {
+					cardList = CardList.find({"rarity": 4}).fetch();
+					randIndex = Math.floor(Math.random() * (cardList.length));
+					cardsDrawn.push(cardList[randIndex]._id);
+				}
+				else if (rand >= 995) {
+					cardList = CardList.find({"rarity": 5}).fetch();
+					randIndex = Math.floor(Math.random() * (cardList.length));
+					cardsDrawn.push(cardList[randIndex]._id);
+				}
+			}
+			console.log(cardsDrawn);
+			
+			var newStats;
+			if (action) {
+				newStats = userInfo.stats;
+				for (var i = 0; i < cardsDrawn.length; i++) {
+					newStats.cards.push(cardsDrawn[i]);
+				}
+				UserInfo.update({"username": user.username}, {
+					$set: {
+						"stats.cards": newStats.cards
+					},
+					$inc: {
+						"stats.actionsLeft": -1
+					}
+				});
+			}
+			else {
+				console.log("Not an action, username: " + userInfo.username);
+				console.log(userInfo);
+				newStats = userInfo.stats;
+				for (var i = 0; i < cardsDrawn.length; i++) {
+					newStats.cards.push(cardsDrawn[i]);
+				}
+				console.log(newStats.cards + " " + userInfo._id);
+				UserInfo.update({"username": user.username}, {
+					$set: {
+						"stats.cards": newStats.cards
+					}
+				});
+				var playerStats = UserInfo.find({"username": user.username}).fetch()[0];
+				console.log("Name: " + playerStats.username + " and cards: " + playerStats.stats.cards);
+			}
+		};
+		
+		console.log("Is admin? " + admin);
+		if (user.username == Game.pList[Game.turn] && false) {
+			
+		}
+		else if (user.username == Game.pList[Game.turn] && false) {
+			
+		}
+		else if (Game.round == 0 && Game.stats[user.username].cards.length == 0 && false) {
+			draw(5, false);
+		}
+		else if (admin) {
+			console.log("Admin: " + admin);
+			draw(5, false);
+		}
 	}
 });

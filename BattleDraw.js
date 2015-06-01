@@ -21,7 +21,7 @@ if (Meteor.isClient) {
 
 	setInterval(function () {
 		if (Meteor.user()) {
-			var userInfo = UserInfo.find().fetch();
+			var userInfo = UserInfo.find({ "username": Meteor.user().username }).fetch();
 			if (!userInfo[0]) {
 				Meteor.call("addUser");
 			}
@@ -46,7 +46,7 @@ if (Meteor.isClient) {
 				if (game.countDown > 0) {
 					Meteor.call("updateCountDown");
 				}
-				else if (game.countDown == 0) {
+				else if (game.countDown == 0 && game.round < 1) {
 					Meteor.call("startGame");
 				}
 			}
@@ -92,8 +92,9 @@ if (Meteor.isServer) {
 	Meteor.publish("userinfo", function () {
 		var userId = this.userId;
 		if (userId) {
-			var username = Meteor.users.findOne(userId).username;
-			return UserInfo.find({ "username": username });
+			var user = Meteor.users.findOne(userId);
+			var userInfo = UserInfo.find({"username": user.username}).fetch()[0];
+			return UserInfo.find({ "gameId": userInfo.gameId });
 		}
 	});
 	
