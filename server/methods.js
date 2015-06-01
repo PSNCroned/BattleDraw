@@ -50,7 +50,8 @@ Meteor.methods({
 		if (!exists) {
 			UserInfo.insert({
 				"username": user.username,
-				"inGame": false
+				"inGame": false,
+				"gameId": user.username
 			});
 			
 			console.log("Inserted " + user.username + " into UserInfo");
@@ -142,24 +143,23 @@ Meteor.methods({
 		
 		UserInfo.update({"username": user.username}, {
 			$set: {
-				"inGame": false
+				"inGame": false,
+				"gameId": user.username
 			},
 			$unset: {
-				"gameId": ""
+				"stats": ""
 			}
 		});
 	},
-	"draw": function(amt, action, admin) {
+	"draw": function(amt, action) {
 		var user = Meteor.users.findOne(this.userId);
 		var userInfo = UserInfo.find({"username": user.username}).fetch()[0];
 		var gameId = UserInfo.find({"username": user.username}).fetch()[0].gameId;
 		var Game = GameList.find(gameId).fetch()[0];
 		var draw = function(amt, action) {
-			console.log("Draw function called");
 			var cardsDrawn = [];
 			for (var i = 0; i < amt; i++) {
 				var rand = Math.floor((Math.random() * 1000) + 1);
-				console.log("Rand: " + rand);
 				var cardList, randIndex;
 				if (rand <= 500) {
 					cardList = CardList.find({"rarity": 1}).fetch();
@@ -187,7 +187,6 @@ Meteor.methods({
 					cardsDrawn.push(cardList[randIndex]._id);
 				}
 			}
-			console.log(cardsDrawn);
 			
 			var newStats;
 			if (action) {
@@ -205,35 +204,31 @@ Meteor.methods({
 				});
 			}
 			else {
-				console.log("Not an action, username: " + userInfo.username);
-				console.log(userInfo);
 				newStats = userInfo.stats;
 				for (var i = 0; i < cardsDrawn.length; i++) {
 					newStats.cards.push(cardsDrawn[i]);
 				}
-				console.log(newStats.cards + " " + userInfo._id);
 				UserInfo.update({"username": user.username}, {
 					$set: {
 						"stats.cards": newStats.cards
 					}
 				});
-				var playerStats = UserInfo.find({"username": user.username}).fetch()[0];
-				console.log("Name: " + playerStats.username + " and cards: " + playerStats.stats.cards);
 			}
 		};
 		
-		console.log("Is admin? " + admin);
 		if (user.username == Game.pList[Game.turn] && false) {
-			
+			//Drawing normally
 		}
 		else if (user.username == Game.pList[Game.turn] && false) {
-			
+			//Drawing through Draw card
 		}
-		else if (Game.round == 0 && Game.stats[user.username].cards.length == 0 && false) {
+		else if (Game.round == 1 && userInfo.stats.cards.length == 0) {
+			//Dealing 5 cards on initial spawn
+			console.log("Dealing first cards!");
 			draw(5, false);
 		}
-		else if (admin) {
-			console.log("Admin: " + admin);
+		else if (false) {
+			//Testing the draw function
 			draw(5, false);
 		}
 	}

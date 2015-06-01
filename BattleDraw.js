@@ -49,6 +49,9 @@ if (Meteor.isClient) {
 				else if (game.countDown == 0 && game.round < 1) {
 					Meteor.call("startGame");
 				}
+				else if (game.round == 1) {
+					Meteor.call("draw", 5, false);
+				}
 			}
 		}
 	}, 1000);
@@ -92,9 +95,7 @@ if (Meteor.isServer) {
 	Meteor.publish("userinfo", function () {
 		var userId = this.userId;
 		if (userId) {
-			var user = Meteor.users.findOne(userId);
-			var userInfo = UserInfo.find({"username": user.username}).fetch()[0];
-			return UserInfo.find({ "gameId": userInfo.gameId });
+			return UserInfo.find();
 		}
 	});
 	
