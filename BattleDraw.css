@@ -118,6 +118,7 @@ h2 {
 #centerWindow {
 	height: 200px;
 	border: none;
+	overflow: hidden;
 }
 
 #yourStats {
@@ -158,6 +159,7 @@ h2 {
 	background-color: #f2cc85;
 	text-align: center;
 	display: inline-block;
+	cursor: pointer;
 }
 
 .cardTitle {
@@ -179,7 +181,7 @@ h2 {
 
 #drawDeck {
 	float: left;
-	margin-left: 40px;
+	margin-left: 80px;
 	position: relative;
 	top: 50%;
 	transform: translateY(-50%);
@@ -234,4 +236,11 @@ h2 {
 	border-top: 1px solid #999;
 	margin-top: 2.5px;
 	padding-top: 2.5px;
+}
+
+#lastCard {
+	float: right;
+	margin-right: 80px;
+	position: relative;
+	transform: translateY(-105%);
 }
