@@ -16,7 +16,8 @@ Meteor.methods({
 				"countDown": countDown,
 				"round": 0,
 				"turn": 0,
-				"drawPhase": false
+				"drawPhase": false,
+				"chatList": []
 			});
 			console.log("Created game: " + gameId);
 			return gameId;
@@ -59,7 +60,8 @@ Meteor.methods({
 		}
 	},
 	"removeUser": function (name) {
-		UserInfo.remove({ "username": { $eq: name } });
+		//Not used
+		//UserInfo.remove({ "username": { $eq: name } });
 	},
 	"beginCount": function(gameId) {
 		var Game = GameList.find(gameId).fetch()[0];
@@ -234,7 +236,7 @@ Meteor.methods({
 		};
 		
 		if (user.username == Game.pList[Game.turn] && Game.drawPhase == false) {
-			console.log("Making a regular card draw!");
+			//Regular card draw
 			draw(1, true);
 		}
 		else if (user.username == Game.pList[Game.turn] && false) {
@@ -242,7 +244,6 @@ Meteor.methods({
 		}
 		else if (Game.round == 1 && userInfo.stats.cards.length < 5 && Game.drawPhase == true && userInfo.stats.drawnFirstCards == false) {
 			//Dealing 5 cards on initial spawn
-			console.log("Dealing first cards!");
 			draw(5, false);
 			UserInfo.update({"username": user.username}, {
 				$set: {
@@ -254,5 +255,15 @@ Meteor.methods({
 			//Testing the draw function
 			draw(5, false);
 		}
+	},
+	"sendChat": function (msg) {
+		var user = Meteor.users.findOne(this.userId);
+		var Game = GameList.find(UserInfo.find({"username": user.username}).fetch()[0].gameId).fetch()[0];
+		var chatObj = {"sender": user.username, "msg": msg, "time": new Date()};
+		GameList.update(Game._id, {
+			$push: {
+				"chatList": chatObj
+			}
+		});
 	}
 });

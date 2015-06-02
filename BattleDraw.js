@@ -20,9 +20,16 @@ if (Meteor.isClient) {
 	Accounts.ui.config({
 		passwordSignupFields: "USERNAME_ONLY"
 	});
-
+	
+	var scroll = function () {
+		var element = document.getElementById("msgList");
+		element.scrollTop = element.scrollHeight;
+	};
+	
 	setInterval(function () {
 		if (Meteor.user()) {
+			scroll();
+			
 			var userInfo = UserInfo.find({ "username": Meteor.user().username }).fetch();
 			if (!userInfo[0]) {
 				Meteor.call("addUser");

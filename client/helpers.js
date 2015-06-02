@@ -117,5 +117,10 @@ Template.game.helpers({
 			}
 			return cardList;
 		}
+	},
+	"chatMessages": function () {
+		var Game = GameList.find(UserInfo.find({ "username": Meteor.user().username }).fetch()[0].gameId).fetch()[0];
+		var chatList = Game.chatList;
+		return chatList;
 	}
 });

@@ -70,6 +70,22 @@
 			</div>
 			<div id="centerWindow" class="windowSection">
 				<img src="Images/cardDeck.png" height="175" id="drawDeck" />
+				<div id="chat">
+					<div id="msgList">
+						{{#each chatMessages}}
+							<div class="chatMsg">
+								<b>{{sender}}</b>: {{msg}}
+							</div>
+						{{/each}}
+					</div>
+					<form id="chatForm">
+						<input type="text" id="msgText" placeholder="Enter message" />
+						<input type="submit" value="Send" id="chatSubmit" />
+					</form>
+				</div>
+				<div id="lastCard">
+					
+				</div>
 			</div>
 			<div id="yourStats" class="stats windowSection">
 				{{#if yourStats}}
