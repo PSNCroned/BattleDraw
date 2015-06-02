@@ -28,11 +28,12 @@ if (Meteor.isClient) {
 	
 	setInterval(function () {
 		if (Meteor.user()) {
-			scroll();
-			
 			var userInfo = UserInfo.find({ "username": Meteor.user().username }).fetch();
 			if (!userInfo[0]) {
 				Meteor.call("addUser");
+			}
+			else if (userInfo[0].inGame) {
+				scroll();
 			}
 			
 			var userInfoFetch = UserInfo.find({"username": Meteor.user().username}).fetch()[0];
