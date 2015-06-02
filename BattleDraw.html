@@ -51,7 +51,7 @@
 				{{#if theirStats}}
 					<div class="stat">Units: {{theirStats.units}}</div>
 					<div class="stat">Money: ${{theirStats.money}}</div>
-					<div class="stat">Territory: {{theirStats.territory}}</div>
+					<div class="stat">Territories: {{theirStats.territory}}</div>
 					<div class="stat">Supplies: {{theirStats.supplies}}</div>
 				{{/if}}
 			</div>
@@ -69,13 +69,13 @@
 				</table>
 			</div>
 			<div id="centerWindow" class="windowSection">
-				
+				<img src="Images/cardDeck.png" height="175" id="drawDeck" />
 			</div>
 			<div id="yourStats" class="stats windowSection">
 				{{#if yourStats}}
 					<div class="stat">Units: {{yourStats.units}}</div>
-					<div class="stat">Money: {{yourStats.money}}</div>
-					<div class="stat">Territory: {{yourStats.territory}}</div>
+					<div class="stat">Money: ${{yourStats.money}}</div>
+					<div class="stat">Territories: {{yourStats.territory}}</div>
 					<div class="stat">Supplies: {{yourStats.supplies}}</div>
 				{{/if}}
 			</div>
@@ -86,6 +86,7 @@
 							<td>
 								<div class="card">
 									<span class="cardTitle">{{name}}</span>
+									<span class="cardDesc">{{desc}}</span>
 								</div>
 							</td>
 						{{/each}}

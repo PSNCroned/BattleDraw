@@ -15,7 +15,8 @@ Meteor.methods({
 				"hasStarted": hasStarted,
 				"countDown": countDown,
 				"round": 0,
-				"turn": 0
+				"turn": 0,
+				"drawPhase": false
 			});
 			console.log("Created game: " + gameId);
 			return gameId;
@@ -103,7 +104,7 @@ Meteor.methods({
 		var gameId = userInfo.gameId;
 		var Game = GameList.find(gameId).fetch()[0];
 		if (Game.hasStarted && user.username == Game.host) {
-			var stats = {"units": 100, "money": 1500, "territory": 50, "supplies": 40, "actionsLeft": 3, "cards": []};
+			var stats = {"units": 100, "money": 1500, "territory": 50, "supplies": 40, "actionsLeft": 3, "cards": [], "drawnFirstCards": false};
 				
 			for (var i = 0; i < Game.pList.length; i++) {
 				UserInfo.update(UserInfo.find({"username": Game.pList[i]}).fetch()[0]._id, {
@@ -113,6 +114,9 @@ Meteor.methods({
 				});
 			}
 			GameList.update(gameId, {
+				$set: {
+					"drawPhase": true
+				},
 				$inc: {
 					"round": 1
 				}
@@ -152,6 +156,7 @@ Meteor.methods({
 		});
 	},
 	"draw": function(amt, action) {
+		console.log("Draw called!");
 		var user = Meteor.users.findOne(this.userId);
 		var userInfo = UserInfo.find({"username": user.username}).fetch()[0];
 		var gameId = UserInfo.find({"username": user.username}).fetch()[0].gameId;
@@ -213,19 +218,37 @@ Meteor.methods({
 						"stats.cards": newStats.cards
 					}
 				});
+				for (var i = 0, usersDrawn = 0; i < Game.pList.length; i++) {
+					if (UserInfo.find({"username": Game.pList[i]}).fetch()[0].stats.cards.length >= 5) {
+						usersDrawn++;
+					}
+					if (usersDrawn >= Game.maxPlayers) {
+						GameList.update(gameId, {
+							$set: {
+								"drawPhase": false
+							}
+						});
+					}
+				}
 			}
 		};
 		
-		if (user.username == Game.pList[Game.turn] && false) {
-			//Drawing normally
+		if (user.username == Game.pList[Game.turn] && Game.drawPhase == false) {
+			console.log("Making a regular card draw!");
+			draw(1, true);
 		}
 		else if (user.username == Game.pList[Game.turn] && false) {
 			//Drawing through Draw card
 		}
-		else if (Game.round == 1 && userInfo.stats.cards.length == 0) {
+		else if (Game.round == 1 && userInfo.stats.cards.length < 5 && Game.drawPhase == true && userInfo.stats.drawnFirstCards == false) {
 			//Dealing 5 cards on initial spawn
 			console.log("Dealing first cards!");
 			draw(5, false);
+			UserInfo.update({"username": user.username}, {
+				$set: {
+					"stats.drawnFirstCards": true
+				}
+			});
 		}
 		else if (false) {
 			//Testing the draw function

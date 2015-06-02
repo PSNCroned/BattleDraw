@@ -117,6 +117,7 @@ h2 {
 
 #centerWindow {
 	height: 200px;
+	border: none;
 }
 
 #yourStats {
@@ -154,7 +155,7 @@ h2 {
 	width: 125px;
 	border: 1px solid black;
 	margin-right: 5px;
-	background-color: burlywood;
+	background-color: #f2cc85;
 	text-align: center;
 	display: inline-block;
 }
@@ -163,8 +164,24 @@ h2 {
 	font-weight: bold;
 }
 
+.cardDesc {
+	display: block;
+	border-top: 1px solid black;
+	padding-top: 5px;
+	font-size: 15px;
+}
+
 .cardBack {
 	position: relative;
 	top: 50%;
 	transform: translateY(-50%);
+}
+
+#drawDeck {
+	float: left;
+	margin-left: 40px;
+	position: relative;
+	top: 50%;
+	transform: translateY(-50%);
+	cursor: pointer;
 }

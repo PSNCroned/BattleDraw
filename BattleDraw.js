@@ -57,7 +57,7 @@ if (Meteor.isClient) {
 				else if (game.countDown == 0 && game.round < 1) {
 					Meteor.call("startGame");
 				}
-				else if (game.round == 1) {
+				else if (game.round == 1 && UserInfo.find({"username": Meteor.user().username}).fetch()[0].stats.cards.length < 5) {
 					Meteor.call("draw", 5, false);
 				}
 			}
@@ -80,14 +80,14 @@ if (Meteor.isServer) {
 			{ "_id": "9", "name": "Medium Bomb", "desc": "Bombs the opponent's units. Chance of killing 5% to 30% of units, costs 250 supplies and $250", "class": "bomb", "rarity": 3 },
 			{ "_id": "10", "name": "Advanced Attack", "desc": "Attacks with 90% of units. Chance of capturing 3 to 8 territories", "class": "attack", "rarity": 3 },
 			{ "_id": "11", "name": "Advanced Raid", "desc": "Raids with 90% of units. Chance of stealing 50% to 90% of supplies and 7% to 15% of money", "class": "raid", "rarity": 3 },
-			{ "_id": "12", "name": "Basic Assassinate", "desc": "Kills enemy units with 5% of your units. Chance of killing %10 to 15% of enemy units", "class": "assassinate", "rarity": 3 },
+			{ "_id": "12", "name": "Basic Assassinate", "desc": "Kills enemy units with 5% of your units. Chance of killing 10% to 15% of enemy units", "class": "assassinate", "rarity": 3 },
 			{ "_id": "13", "name": "Draw 4", "desc": "Draw four cards. Drawing the cards does not count as extra actions", "class": "draw", "rarity": 4 },
 			{ "_id": "14", "name": "Large Bomb", "desc": "Bombs the opponent's units. Chance of killing 20% to 50% of units, costs 500 supplies and $500", "class": "bomb", "rarity": 4 },
 			{ "_id": "15", "name": "Stealth Raid", "desc": "Raids with 20% of units. Chance of stealing 60% to 80% of supplies and 15% to 20% of money", "class": "raid", "rarity": 4 },
-			{ "_id": "16", "name": "Intermediate Assassinate", "desc": "Kills enemy units with 10% of your units. Chance of killing %20 to 30% of enemy units", "class": "assassinate", "rarity": 4 },
+			{ "_id": "16", "name": "Intermediate Assassinate", "desc": "Kills enemy units with 10% of your units. Chance of killing 20% to 30% of enemy units", "class": "assassinate", "rarity": 4 },
 			{ "_id": "17", "name": "Draw 5", "desc": "Draw four cards. Drawing the cards does not count as extra actions", "class": "draw", "rarity": 5 },
 			{ "_id": "18", "name": "Nuke", "desc": "Bombs the opponent's units. Chance of killing 70% to 90% of units, costs 1000 supplies and $1000", "class": "bomb", "rarity": 5 },
-			{ "_id": "19", "name": "Advanced Assassinate", "desc": "Kills enemy units with 20% of your units. Chance of killing %40 to 50% of enemy units", "class": "Assassinate", "rarity": 5 }
+			{ "_id": "19", "name": "Advanced Assassinate", "desc": "Kills enemy units with 20% of your units. Chance of killing 40% to 50% of enemy units", "class": "Assassinate", "rarity": 5 }
 		];
 		for (var i = 0; i < cards.length; i++) {
 			if (CardList.find(cards[i]._id).fetch().length == 0) {
