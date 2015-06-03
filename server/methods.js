@@ -158,7 +158,6 @@ Meteor.methods({
 		});
 	},
 	"draw": function(amt, action) {
-		console.log("Draw called!");
 		var user = Meteor.users.findOne(this.userId);
 		var userInfo = UserInfo.find({"username": user.username}).fetch()[0];
 		var gameId = UserInfo.find({"username": user.username}).fetch()[0].gameId;
@@ -233,6 +232,13 @@ Meteor.methods({
 					}
 				}
 			}
+			if (userInfo.stats.cards.length >= 5 && Game.round == 1) {
+				UserInfo.update({"username": user.username}, {
+					$set: {
+						"stats.drawnFirstCards": true
+					}
+				});
+			}
 		};
 		
 		if (user.username == Game.pList[Game.turn] && Game.drawPhase == false) {
@@ -245,11 +251,6 @@ Meteor.methods({
 		else if (Game.round == 1 && userInfo.stats.cards.length < 5 && Game.drawPhase == true && userInfo.stats.drawnFirstCards == false) {
 			//Dealing 5 cards on initial spawn
 			draw(5, false);
-			UserInfo.update({"username": user.username}, {
-				$set: {
-					"stats.drawnFirstCards": true
-				}
-			});
 		}
 		else if (false) {
 			//Testing the draw function
@@ -265,5 +266,107 @@ Meteor.methods({
 				"chatList": chatObj
 			}
 		});
+	},
+	"playCard": function (card) {
+		var user = Meteor.users.findOne(this.userId);
+		var userInfo = UserInfo.find({"username": user.username}).fetch()[0];
+		var gameId = UserInfo.find({"username": user.username}).fetch()[0].gameId;
+		var Game = GameList.find(gameId).fetch()[0];
+		var hasCard;
+		
+		//Define functions for card actions here
+		var attack = function (unitAmt, min, max) {
+			var unitAmtPercent = unitAmt / 100;
+			var randUnitAmt = Math.floor((Math.random() * (userInfo.stats.units * unitAmtPercent + 1)));
+			console.log("Units lost: " + randUnitAmt);
+			var playerName, newAmt;
+			for (var i = 0; i < Game.pList.length; i++) {
+				playerName = Game.pList[i];
+				//if (playerName == recipient || playerName == user.username) {} -- For later use when more than 2 players are supported
+				newAmt = UserInfo.find({"username": playerName}).fetch()[0].stats.units - randUnitAmt;
+				console.log(playerName + " now has " + newAmt + " units");
+				UserInfo.update({"username": playerName}, {
+					$set: {
+						"stats.units": newAmt
+					}
+				});
+			}
+			
+			var randTerrAmt = Math.floor((Math.random() * (max + 1)) + min);
+			for (var i = 0; i < Game.pList.length; i++) {
+				playerName = Game.pList[i];
+				if (playerName == user.username) {
+					newAmt = UserInfo.find({"username": playerName}).fetch()[0].stats.territory + randTerrAmt;
+					UserInfo.update({"username": playerName}, {
+						$set: {
+							"stats.territory": newAmt
+						}
+					});
+				}
+				else {
+					newAmt = UserInfo.find({"username": playerName}).fetch()[0].stats.territory - randTerrAmt;
+					UserInfo.update({"username": playerName}, {
+						$set: {
+							"stats.territory": newAmt
+						}
+					});
+				}
+			}
+		};
+		
+		for (var i = 0; i < userInfo.stats.cards.length; i++) {
+			if (userInfo.stats.cards[i] == card) {
+				hasCard = true;
+			}
+		}
+		
+		if (hasCard && Game.turn == Game.pList.indexOf(user.username)) {
+			console.log("User has card!");
+			switch (CardList.find(String(card)).fetch()[0].class) {
+				case "attack":
+					
+					switch (CardList.find(String(card)).fetch()[0].rarity) {
+						case 1:
+							attack(20, 0, 3);
+							break;
+							
+						case 2:
+							
+							break;
+							
+						case 3:
+							
+							break;
+					}
+					
+					break;
+				
+				case "buy":
+					
+					break;
+				
+				case "raid":
+					
+					break;
+				
+				case "bomb":
+					
+					break;
+				
+				case "draw":
+					
+					break;
+				
+				case "assassinate":
+					
+					break;
+			
+				default:
+					console.log("Card does not exist!");
+			}
+		}
+		else {
+			console.log("User does not have the card!");
+		}
 	}
 });

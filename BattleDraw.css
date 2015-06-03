@@ -233,8 +233,7 @@ h2 {
 .chatMsg {
 	width: 340px;
 	word-wrap: break-word;
-	border-top: 1px solid #999;
-	margin-top: 2.5px;
+	margin-top: 5px;
 	padding-top: 2.5px;
 }
 
