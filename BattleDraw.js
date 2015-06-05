@@ -32,9 +32,6 @@ if (Meteor.isClient) {
 			if (!userInfo[0]) {
 				Meteor.call("addUser");
 			}
-			else if (userInfo[0].inGame) {
-				scroll();
-			}
 			
 			var userInfoFetch = UserInfo.find({"username": Meteor.user().username}).fetch()[0];
 			if (userInfoFetch.inGame) {
@@ -44,6 +41,8 @@ if (Meteor.isClient) {
 					Meteor.call("beginCount", game._id);
 				}
 				Meteor.call("updateCountDown", game._id);
+				Meteor.call("switchTurn");
+				scroll();
 			}
 		}
 		if ($("#yourCardTable").width() > 800) {

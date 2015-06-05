@@ -63,7 +63,7 @@ Meteor.methods({
 		//Not used
 		//UserInfo.remove({ "username": { $eq: name } });
 	},
-	"beginCount": function(gameId) {
+	"beginCount": function (gameId) {
 		var Game = GameList.find(gameId).fetch()[0];
 		if (this.userId) {
 			var user = Meteor.users.findOne(this.userId);
@@ -79,7 +79,7 @@ Meteor.methods({
 			}
 		}
 	},
-	"updateCountDown": function() {
+	"updateCountDown": function () {
 		var user = Meteor.users.findOne(this.userId);
 		var userInfo = UserInfo.find({"username": user.username}).fetch()[0];
 		var gameId = userInfo.gameId;
@@ -157,12 +157,12 @@ Meteor.methods({
 			}
 		});
 	},
-	"draw": function(amt, action) {
+	"draw": function (amt, action) {
 		var user = Meteor.users.findOne(this.userId);
 		var userInfo = UserInfo.find({"username": user.username}).fetch()[0];
 		var gameId = UserInfo.find({"username": user.username}).fetch()[0].gameId;
 		var Game = GameList.find(gameId).fetch()[0];
-		var draw = function(amt, action) {
+		var draw = function (amt, action) {
 			var cardsDrawn = [];
 			for (var i = 0; i < amt; i++) {
 				var rand = Math.floor((Math.random() * 1000) + 1);
@@ -241,8 +241,9 @@ Meteor.methods({
 			}
 		};
 		
-		if (user.username == Game.pList[Game.turn] && Game.drawPhase == false) {
+		if (user.username == Game.pList[Game.turn] && !Game.drawPhase && userInfo.stats.actionsLeft > 0) {
 			//Regular card draw
+			console.log("reg draw called");
 			draw(1, true);
 		}
 		else if (user.username == Game.pList[Game.turn] && false) {
@@ -257,17 +258,29 @@ Meteor.methods({
 			draw(5, false);
 		}
 	},
-	"sendChat": function (msg) {
-		var user = Meteor.users.findOne(this.userId);
-		var Game = GameList.find(UserInfo.find({"username": user.username}).fetch()[0].gameId).fetch()[0];
-		var chatObj = {"sender": user.username, "msg": msg, "time": new Date()};
-		GameList.update(Game._id, {
-			$push: {
-				"chatList": chatObj
-			}
-		});
+	"sendChat": function (msg, server) {
+		if (!server) {
+			var user = Meteor.users.findOne(this.userId);
+			var Game = GameList.find(UserInfo.find({"username": user.username}).fetch()[0].gameId).fetch()[0];
+			var chatObj = {"sender": user.username, "msg": msg, "time": new Date()};
+			GameList.update(Game._id, {
+				$push: {
+					"chatList": chatObj
+				}
+			});
+		}
+		else {
+			Game = server.game;
+			chatObj = {"sender": "@", "msg": msg, "time": new Date(), "color": server.color};
+			GameList.update(Game._id, {
+				$push: {
+					"chatList": chatObj
+				}
+			});
+		}
+			
 	},
-	"playCard": function (card) {
+	"playCard": function (card, recipient) {
 		var user = Meteor.users.findOne(this.userId);
 		var userInfo = UserInfo.find({"username": user.username}).fetch()[0];
 		var gameId = UserInfo.find({"username": user.username}).fetch()[0].gameId;
@@ -278,13 +291,11 @@ Meteor.methods({
 		var attack = function (unitAmt, min, max) {
 			var unitAmtPercent = unitAmt / 100;
 			var randUnitAmt = Math.floor((Math.random() * (userInfo.stats.units * unitAmtPercent + 1)));
-			console.log("Units lost: " + randUnitAmt);
 			var playerName, newAmt;
 			for (var i = 0; i < Game.pList.length; i++) {
 				playerName = Game.pList[i];
 				//if (playerName == recipient || playerName == user.username) {} -- For later use when more than 2 players are supported
 				newAmt = UserInfo.find({"username": playerName}).fetch()[0].stats.units - randUnitAmt;
-				console.log(playerName + " now has " + newAmt + " units");
 				UserInfo.update({"username": playerName}, {
 					$set: {
 						"stats.units": newAmt
@@ -312,6 +323,12 @@ Meteor.methods({
 					});
 				}
 			}
+			
+			var msg = user.username + " has captured " + randTerrAmt + " territories from " + recipient + " at a cost of " + randUnitAmt + " units!";
+			Meteor.call("sendChat", msg, {
+				"game": Game,
+				"color": "#800000"
+			});
 		};
 		
 		for (var i = 0; i < userInfo.stats.cards.length; i++) {
@@ -331,11 +348,11 @@ Meteor.methods({
 							break;
 							
 						case 2:
-							
+							attack(50, 1, 6);
 							break;
 							
 						case 3:
-							
+							attack(90, 5, 8);
 							break;
 					}
 					
@@ -367,6 +384,43 @@ Meteor.methods({
 		}
 		else {
 			console.log("User does not have the card!");
+		}
+	},
+	"switchTurn": function () {
+		var user = Meteor.users.findOne(this.userId);
+		var userInfo = UserInfo.find({"username": user.username}).fetch()[0];
+		var gameId = UserInfo.find({"username": user.username}).fetch()[0].gameId;
+		var Game = GameList.find(gameId).fetch()[0];
+		if (Game.countDown <= 0 && userInfo.stats) {
+			if (Game.turn == Game.pList.indexOf(user.username) && userInfo.stats.actionsLeft <= 0) {
+				console.log("method call is valid");
+				if (Game.turn == Game.pList.length - 1) {
+					UserInfo.update({"username": user.username}, {
+						$set: {
+							"stats.actionsLeft": 3
+						}
+					});
+					GameList.update(Game._id, {
+						$set: {
+							"turn": 0
+						}
+					});
+					console.log("It is now " + Game.pList[Game.turn] + "'s turn");
+				}
+				else {
+					UserInfo.update({"username": user.username}, {
+						$set: {
+							"stats.actionsLeft": 3
+						}
+					});
+					GameList.update(Game._id, {
+						$inc: {
+							"turn": 1
+						}
+					});
+					console.log("It is now " + Game.pList[Game.turn] + "'s turn");
+				}
+			}
 		}
 	}
 });
