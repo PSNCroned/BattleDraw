@@ -281,6 +281,7 @@ Meteor.methods({
 			
 	},
 	"playCard": function (card, recipient) {
+		console.log("Card: " + card + " at " + recipient);
 		var user = Meteor.users.findOne(this.userId);
 		var userInfo = UserInfo.find({"username": user.username}).fetch()[0];
 		var gameId = UserInfo.find({"username": user.username}).fetch()[0].gameId;
@@ -381,9 +382,20 @@ Meteor.methods({
 				default:
 					console.log("Card does not exist!");
 			}
+			var cardList = userInfo.stats.cards;
+			var index = cardList.indexOf(card);
+			cardList.splice(index, 1);
+			UserInfo.update({"username": user.username}, {
+				$set: {
+					"stats.cards": cardList
+				},
+				$inc: {
+					"stats.actionsLeft": -1
+				}
+			});
 		}
 		else {
-			console.log("User does not have the card!");
+			console.log("User does not have the card or it is not their turn!");
 		}
 	},
 	"switchTurn": function () {
