@@ -157,12 +157,12 @@ Meteor.methods({
 			}
 		});
 	},
-	"draw": function (amt, action) {
+	"draw": function (amt, action, isClient) {
 		var user = Meteor.users.findOne(this.userId);
 		var userInfo = UserInfo.find({"username": user.username}).fetch()[0];
 		var gameId = UserInfo.find({"username": user.username}).fetch()[0].gameId;
 		var Game = GameList.find(gameId).fetch()[0];
-		var draw = function (amt, action) {
+		var drawCards = function (amt, action) {
 			var cardsDrawn = [];
 			for (var i = 0; i < amt; i++) {
 				var rand = Math.floor((Math.random() * 1000) + 1);
@@ -187,7 +187,7 @@ Meteor.methods({
 					randIndex = Math.floor(Math.random() * (cardList.length));
 					cardsDrawn.push(cardList[randIndex]._id);
 				}
-				else if (rand >= 995) {
+				else if (rand >= 955) {
 					cardList = CardList.find({"rarity": 5}).fetch();
 					randIndex = Math.floor(Math.random() * (cardList.length));
 					cardsDrawn.push(cardList[randIndex]._id);
@@ -241,21 +241,22 @@ Meteor.methods({
 			}
 		};
 		
-		if (user.username == Game.pList[Game.turn] && !Game.drawPhase && userInfo.stats.actionsLeft > 0) {
+		if (user.username == Game.pList[Game.turn] && !Game.drawPhase && userInfo.stats.actionsLeft > 0 && isClient) {
 			//Regular card draw
 			console.log("reg draw called");
-			draw(1, true);
+			drawCards(1, true);
 		}
 		else if (user.username == Game.pList[Game.turn] && false) {
 			//Drawing through Draw card
 		}
-		else if (Game.round == 1 && userInfo.stats.cards.length < 5 && Game.drawPhase == true && userInfo.stats.drawnFirstCards == false) {
+		else if (Game.round == 1 && userInfo.stats.cards.length < 5 && Game.drawPhase == true && !userInfo.stats.drawnFirstCards) {
 			//Dealing 5 cards on initial spawn
-			draw(5, false);
+			drawCards(5, false);
+			console.log("initial card draw called");
 		}
 		else if (false) {
 			//Testing the draw function
-			draw(5, false);
+			drawCards(5, false);
 		}
 	},
 	"sendChat": function (msg, server) {
@@ -281,9 +282,9 @@ Meteor.methods({
 			
 	},
 	"playCard": function (card, recipient) {
-		console.log("Card: " + card + " at " + recipient);
 		var user = Meteor.users.findOne(this.userId);
 		var userInfo = UserInfo.find({"username": user.username}).fetch()[0];
+		var recipInfo = UserInfo.find({"username": recipient}).fetch()[0];
 		var gameId = UserInfo.find({"username": user.username}).fetch()[0].gameId;
 		var Game = GameList.find(gameId).fetch()[0];
 		var hasCard;
@@ -292,14 +293,14 @@ Meteor.methods({
 		var attack = function (unitAmt, min, max) {
 			var unitAmtPercent = unitAmt / 100;
 			var randUnitAmt = Math.floor((Math.random() * (userInfo.stats.units * unitAmtPercent + 1)));
-			var playerName, newAmt;
+			var playerName;
 			for (var i = 0; i < Game.pList.length; i++) {
 				playerName = Game.pList[i];
 				//if (playerName == recipient || playerName == user.username) {} -- For later use when more than 2 players are supported
-				newAmt = UserInfo.find({"username": playerName}).fetch()[0].stats.units - randUnitAmt;
+				//newAmt = UserInfo.find({"username": playerName}).fetch()[0].stats.units - randUnitAmt; -- Old, but working code
 				UserInfo.update({"username": playerName}, {
-					$set: {
-						"stats.units": newAmt
+					$inc: {
+						"stats.units": randUnitAmt * -1
 					}
 				});
 			}
@@ -308,18 +309,18 @@ Meteor.methods({
 			for (var i = 0; i < Game.pList.length; i++) {
 				playerName = Game.pList[i];
 				if (playerName == user.username) {
-					newAmt = UserInfo.find({"username": playerName}).fetch()[0].stats.territory + randTerrAmt;
+					//newAmt = UserInfo.find({"username": playerName}).fetch()[0].stats.territory + randTerrAmt; -- Old, but working code
 					UserInfo.update({"username": playerName}, {
-						$set: {
-							"stats.territory": newAmt
+						$inc: {
+							"stats.territory": randTerrAmt
 						}
 					});
 				}
 				else {
-					newAmt = UserInfo.find({"username": playerName}).fetch()[0].stats.territory - randTerrAmt;
+					//newAmt = UserInfo.find({"username": playerName}).fetch()[0].stats.territory - randTerrAmt; -- Old, but working code
 					UserInfo.update({"username": playerName}, {
-						$set: {
-							"stats.territory": newAmt
+						$inc: {
+							"stats.territory": randTerrAmt * -1
 						}
 					});
 				}
@@ -332,6 +333,68 @@ Meteor.methods({
 			});
 		};
 		
+		var raid = function (unitAmt, supMin, supMax, monMin, monMax) {
+			var unitAmtPercent = unitAmt / 100;
+			var randUnitAmt = Math.floor((Math.random() * (userInfo.stats.units * unitAmtPercent + 1)));
+			var playerName;
+			for (var i = 0; i < Game.pList.length; i++) {
+				playerName = Game.pList[i];
+				//if (playerName == recipient || playerName == user.username) {} -- For later use when more than 2 players are supported
+				UserInfo.update({"username": playerName}, {
+					$inc: {
+						"stats.units": randUnitAmt * -1
+					}
+				});
+			}
+			
+			var randSupplyPercent = Math.floor(Math.random() * (supMax + 1) + supMin) / 100;
+			var randSupplyAmt = Math.round(recipInfo.stats.supplies * randSupplyPercent);
+			for (var i = 0; i < Game.pList.length; i++) {
+				playerName = Game.pList[i];
+				if (playerName == user.username) {
+					UserInfo.update({"username": playerName}, {
+						$inc: {
+							"stats.supplies": randSupplyAmt
+						}
+					});
+				}
+				else {
+					UserInfo.update({"username": playerName}, {
+						$inc: {
+							"stats.supplies": randSupplyAmt * -1
+						}
+					});
+				}
+			}
+			
+			var randMoneyPercent = Math.floor(Math.random() * (monMax + 1) + monMin) / 100;
+			var randMoneyAmt = Math.round(recipInfo.stats.supplies * randMoneyPercent);
+			for (var i = 0; i < Game.pList.length; i++) {
+				playerName = Game.pList[i];
+				if (playerName == user.username) {
+					UserInfo.update({"username": playerName}, {
+						$inc: {
+							"stats.money": randMoneyAmt
+						}
+					});
+				}
+				else {
+					UserInfo.update({"username": playerName}, {
+						$inc: {
+							"stats.money": -randMoneyAmt
+						}
+					});
+				}
+			}
+			
+			var msg = user.username + " has stolen " + randSupplyAmt + " supplies and $"  + randMoneyAmt + " from " + recipient + " at a cost of " + randUnitAmt + " units!";
+			Meteor.call("sendChat", msg, {
+				"game": Game,
+				"color": "#800000"
+			});
+			
+		};
+		
 		for (var i = 0; i < userInfo.stats.cards.length; i++) {
 			if (userInfo.stats.cards[i] == card) {
 				hasCard = true;
@@ -339,7 +402,6 @@ Meteor.methods({
 		}
 		
 		if (hasCard && Game.turn == Game.pList.indexOf(user.username)) {
-			console.log("User has card!");
 			switch (CardList.find(String(card)).fetch()[0].class) {
 				case "attack":
 					
@@ -365,6 +427,24 @@ Meteor.methods({
 				
 				case "raid":
 					
+					switch (CardList.find(String(card)).fetch()[0].rarity) {
+						case 1:
+							raid(20, 0, 15, 0, 5);
+							break;
+							
+						case 2:
+							raid(50, 10, 50, 5, 10);
+							break;
+							
+						case 3:
+							raid(90, 50, 90, 7, 15);
+							break;
+							
+						case 4:
+							raid(20, 60, 80, 15, 20);
+							break;
+					}
+					
 					break;
 				
 				case "bomb":
@@ -380,7 +460,6 @@ Meteor.methods({
 					break;
 			
 				default:
-					console.log("Card does not exist!");
 			}
 			var cardList = userInfo.stats.cards;
 			var index = cardList.indexOf(card);
@@ -395,7 +474,6 @@ Meteor.methods({
 			});
 		}
 		else {
-			console.log("User does not have the card or it is not their turn!");
 		}
 	},
 	"switchTurn": function () {
@@ -405,7 +483,6 @@ Meteor.methods({
 		var Game = GameList.find(gameId).fetch()[0];
 		if (Game.countDown <= 0 && userInfo.stats) {
 			if (Game.turn == Game.pList.indexOf(user.username) && userInfo.stats.actionsLeft <= 0) {
-				console.log("method call is valid");
 				if (Game.turn == Game.pList.length - 1) {
 					UserInfo.update({"username": user.username}, {
 						$set: {

@@ -23,7 +23,7 @@ Template.form.events({
 Template.game.events({
 	"click #drawDeck": function () {
 		console.log("calling draw");
-		Meteor.call("draw", 1, true);
+		Meteor.call("draw", 1, true, true);
 	},
 	"submit #chatForm": function (event, form) {
 		event.preventDefault();
